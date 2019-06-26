@@ -1,30 +1,41 @@
 # font: https://www.dafont.com/speculum.font
 
 import pygame
+
+from entity import Entity
 from input_handlers import handle_keys
+from map_objects.game_map import GameMap
+from render_functions import render_all
+import util
 
 pygame.init()
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-BLOCK_SIZE = 15
 
-def to_pixel(block_num):
-    return block_num * BLOCK_SIZE
 
 def main():
     # in "block" units, not pixels
     screen_width = 80
     screen_height = 50
+    map_width = 80
+    map_height = 45
     is_fullscreen = False
 
-    player_x = int(screen_width / 2)
-    player_y = int(screen_height / 2)
-
-    size = (to_pixel(screen_width), to_pixel(screen_height))
+    size = (util.to_pixel(screen_width), util.to_pixel(screen_height))
     window = pygame.display.set_mode(size)
     pygame.display.set_caption("roguelike pygame tutorial")
-    character = pygame.image.load("res/character.png").convert_alpha()
+
+    colors = {
+        "dark_wall": Entity(0, 0, "dark_wall"),
+        "dark_ground": Entity(0, 0, "dark_ground")
+    }
+
+    game_map = GameMap(map_width, map_height)
+    
+    player = Entity(int(screen_width / 2), int(screen_height / 2), "character")
+    npc = Entity(player.x - 5, player.y, "npc")
+    entities = [player, npc]
 
     running = True
     while running:
@@ -38,11 +49,11 @@ def main():
                 window = pygame.display.set_mode(size, flags)
             elif "move" in action:
                 move_x, move_y = action["move"]
-                player_x += move_x
-                player_y += move_y
+                if not game_map.is_blocked(player.x + move_x, player.y+move_y):
+                    player.move(move_x, move_y)
 
         window.fill(BLACK)
-        window.blit(character, (to_pixel(player_x), to_pixel(player_y)))
+        render_all(window, entities, game_map, colors)
         pygame.display.update()
     pygame.quit()
 
