@@ -1,4 +1,3 @@
-
 class Tile:
     """
     A tile on a map.  It may or may not be blocked, and may or may not block sight.
@@ -12,4 +11,3 @@ class Tile:
             block_sight = blocked
 
         self.block_sight = block_sight
-        

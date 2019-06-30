@@ -1,7 +1,7 @@
 import pygame
 
+
 def handle_keys(key):
-    #print(key)
     if key.type == pygame.KEYDOWN:
         button = key.key
         # movement keys
@@ -13,7 +13,7 @@ def handle_keys(key):
             return {"move": (-1, 0)}
         if button == pygame.K_RIGHT:
             return {"move": (1, 0)}
-        
+
         if button == pygame.K_ESCAPE:
             return {"exit": True}
 
@@ -25,4 +25,3 @@ def handle_keys(key):
     elif key.type == pygame.QUIT:
         return {"exit": True}
     return {}
-    

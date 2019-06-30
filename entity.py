@@ -1,5 +1,6 @@
 import pygame
 
+
 class Entity:
     """
     A generic object to represent players, enemies, items, etc.
@@ -17,4 +18,3 @@ class Entity:
     def move(self, dx, dy):
         self.x += dx
         self.y += dy
-
