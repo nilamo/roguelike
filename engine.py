@@ -3,6 +3,7 @@
 import pygame
 
 from entity import Entity
+from fov_functions import initialize_fov, recompute_fov
 from input_handlers import handle_keys
 from map_objects.game_map import GameMap
 from render_functions import render_all
@@ -17,13 +18,17 @@ BLACK = (0, 0, 0)
 def main():
     # in "block" units, not pixels
     screen_width = 80
-    screen_height = 50
+    screen_height = 45
     map_width = 80
     map_height = 45
     room_max_size = 10
     room_min_size = 6
     max_rooms = 30
     is_fullscreen = False
+
+    fov_light_walls = True
+    fov_radius = 10
+    fov_recompute = True
 
     size = (util.to_pixel(screen_width), util.to_pixel(screen_height))
     window = pygame.display.set_mode(size)
@@ -32,6 +37,8 @@ def main():
     colors = {
         "dark_wall": Entity(0, 0, "dark_wall"),
         "dark_ground": Entity(0, 0, "dark_ground"),
+        "light_wall": Entity(0, 0, "light_wall"),
+        "light_ground": Entity(0, 0, "light_ground"),
     }
 
     player = Entity(int(screen_width / 2), int(screen_height / 2), "character")
@@ -42,6 +49,8 @@ def main():
     game_map.make_map(
         max_rooms, room_min_size, room_max_size, map_width, map_height, player
     )
+
+    fov_map = initialize_fov(game_map)
 
     running = True
     while running:
@@ -57,9 +66,17 @@ def main():
                 move_x, move_y = action["move"]
                 if not game_map.is_blocked(player.x + move_x, player.y + move_y):
                     player.move(move_x, move_y)
+                    fov_recompute = True
+
+        if fov_recompute:
+            fov_map = recompute_fov(
+                game_map, player.x, player.y, fov_radius, fov_light_walls
+            )
+        #            print(fov_map)
 
         window.fill(BLACK)
-        render_all(window, entities, game_map, colors)
+        render_all(window, entities, game_map, fov_map, colors)
+        fov_recompute = False
         pygame.display.update()
     pygame.quit()
 

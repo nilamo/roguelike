@@ -4,6 +4,7 @@ class Tile:
     """
 
     def __init__(self, blocked, block_sight=None):
+        self.explored = False
         self.blocked = blocked
 
         # by default, if a tile is blocked, it also blocks sight
