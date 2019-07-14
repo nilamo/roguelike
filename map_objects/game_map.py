@@ -1,6 +1,7 @@
 import random
 from .rectangle import Rect
 from .tile import Tile
+from entity import Entity
 
 
 class GameMap:
@@ -14,7 +15,15 @@ class GameMap:
         return tiles
 
     def make_map(
-        self, max_rooms, room_min_size, room_max_size, map_width, map_height, player
+        self,
+        max_rooms,
+        room_min_size,
+        room_max_size,
+        map_width,
+        map_height,
+        player,
+        entities,
+        max_monsters_per_room,
     ):
         rooms = []
 
@@ -53,6 +62,8 @@ class GameMap:
                         self.create_v_tunnel(prev_center[1], center[1], prev_center[0])
                         self.create_h_tunnel(prev_center[0], center[0], center[1])
 
+                self.place_entities(new_room, entities, max_monsters_per_room)
+
                 # keep track of the room, so we can check for intersections next loop
                 rooms.append(new_room)
 
@@ -76,6 +87,20 @@ class GameMap:
         for y in range(min_y, max_y + 1):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False
+
+    def place_entities(self, room, entities, max_monsters_per_room):
+        number_of_monsters = random.randint(0, max_monsters_per_room)
+
+        for i in range(number_of_monsters):
+            x = random.randint(room.x1, room.x2 - 1)
+            y = random.randint(room.y1, room.y2 - 1)
+
+            # make sure there isn't something already in that spot
+            if not any(
+                filter(lambda entity: entity.x == x and entity.y == y, entities)
+            ):
+                enemy_type = "orc" if random.randint(0, 100) < 80 else "troll"
+                entities.append(Entity(x, y, enemy_type))
 
     def is_blocked(self, x, y):
         return self.tiles[x][y].blocked

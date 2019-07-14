@@ -24,6 +24,7 @@ def main():
     room_max_size = 10
     room_min_size = 6
     max_rooms = 30
+    max_monsters_per_room = 3
     is_fullscreen = False
 
     fov_light_walls = True
@@ -41,13 +42,19 @@ def main():
         "light_ground": Entity(0, 0, "light_ground"),
     }
 
-    player = Entity(int(screen_width / 2), int(screen_height / 2), "character")
-    npc = Entity(player.x - 5, player.y, "npc")
-    entities = [player, npc]
+    player = Entity(0, 0, "character")
+    entities = [player]
 
     game_map = GameMap(map_width, map_height)
     game_map.make_map(
-        max_rooms, room_min_size, room_max_size, map_width, map_height, player
+        max_rooms,
+        room_min_size,
+        room_max_size,
+        map_width,
+        map_height,
+        player,
+        entities,
+        max_monsters_per_room,
     )
 
     fov_map = initialize_fov(game_map)
@@ -72,7 +79,6 @@ def main():
             fov_map = recompute_fov(
                 game_map, player.x, player.y, fov_radius, fov_light_walls
             )
-        #            print(fov_map)
 
         window.fill(BLACK)
         render_all(window, entities, game_map, fov_map, colors)
